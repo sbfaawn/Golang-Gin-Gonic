@@ -18,6 +18,7 @@ func NewRouter() *gin.Engine {
 }
 
 func bookRouter(r *gin.RouterGroup) {
-	// r.GET("users", handler.)
+	r.GET("books", handler.GetBooksHandler)
 	r.GET("book/:bookId", handler.GetBookHandler)
+	r.POST("book", handler.AddBookHandler)
 }

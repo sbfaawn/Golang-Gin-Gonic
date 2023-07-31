@@ -2,19 +2,36 @@ package service
 
 import (
 	"Golang-Gin-Gonic/model"
+	"Golang-Gin-Gonic/repository"
 	"errors"
 )
 
 func GetBooks() []model.Book {
-	return model.Books
+	return repository.FindBooks()
 }
 
 func GetBookById(id string) (model.Book, error) {
-	for _, book := range model.Books {
-		if book.Id == id {
-			return book, nil
-		}
+	book, err := repository.FindBookById(id)
+
+	if err != nil {
+		return model.Book{}, err
 	}
 
-	return model.Book{}, errors.New("Book with Id" + id + "is not found")
+	return book, nil
+}
+
+func AddBook(book model.Book) (model.Book, error) {
+	_, err := repository.FindBookByDetail(book)
+
+	if err == nil {
+		return model.Book{}, errors.New("book with particular detail is already stored")
+	}
+
+	result, err := repository.AddBook(book)
+
+	if err != nil {
+		return model.Book{}, err
+	}
+
+	return result, nil
 }

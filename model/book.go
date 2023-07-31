@@ -11,3 +11,9 @@ type Book struct {
 	Title  string `json:"title"`
 	Author string `json:"author"`
 }
+
+func (book *Book) EmptyingAllField() {
+	book.Id = ""
+	book.Title = ""
+	book.Author = ""
+}
