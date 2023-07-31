@@ -19,6 +19,8 @@ func NewRouter() *gin.Engine {
 
 func bookRouter(r *gin.RouterGroup) {
 	r.GET("books", handler.GetBooksHandler)
-	r.GET("book/:bookId", handler.GetBookHandler)
-	r.POST("book", handler.AddBookHandler)
+	r.GET("books/:bookId", handler.GetBookHandler)
+	r.POST("books", handler.AddBookHandler)
+	r.PUT("books/:bookId", handler.UpdateBook)
+	r.DELETE("books/:bookId", handler.DeleteBook)
 }

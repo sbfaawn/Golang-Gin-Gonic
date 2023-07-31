@@ -12,7 +12,7 @@ import (
 func GetBookHandler(ctx *gin.Context) {
 	bookId := ctx.Param("bookId")
 
-	book, err := service.GetBookById(bookId)
+	book, err := service.GetBook(bookId)
 
 	if err != nil {
 		generateResponse(ctx, 400, err)
@@ -59,7 +59,7 @@ func AddBookHandler(ctx *gin.Context) {
 
 }
 
-func generateResponse(c *gin.Context, statusCode int, data any) {
+func generateResponse(ctx *gin.Context, statusCode int, data any) {
 	var message string
 
 	message = "Success"
@@ -67,8 +67,46 @@ func generateResponse(c *gin.Context, statusCode int, data any) {
 		message = "Failed"
 	}
 
-	c.JSON(statusCode, response.BaseResponse{
+	ctx.JSON(statusCode, response.BaseResponse{
 		Message: message,
 		Data:    data,
 	})
+}
+
+func UpdateBook(ctx *gin.Context) {
+	bookId := ctx.Param("bookId")
+
+	var request request.BookRequest
+	if err := ctx.BindJSON(&request); err != nil {
+		generateResponse(ctx, 400, err)
+		return
+	}
+
+	book := model.Book{
+		Id:     "",
+		Title:  request.Name,
+		Author: request.Author,
+	}
+
+	result, err := service.UpdateBook(bookId, book)
+
+	if err != nil {
+		generateResponse(ctx, 400, err)
+		return
+	}
+
+	generateResponse(ctx, 200, result)
+}
+
+func DeleteBook(ctx *gin.Context) {
+	bookId := ctx.Param("bookId")
+
+	result, err := service.DeleteBook(bookId)
+
+	if err != nil {
+		generateResponse(ctx, 400, err)
+		return
+	}
+
+	generateResponse(ctx, 200, result)
 }

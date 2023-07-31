@@ -40,3 +40,27 @@ func AddBook(book model.Book) (model.Book, error) {
 
 	return model.Book{}, errors.New("failed to add book to collection")
 }
+
+func UpdateBookById(id string, bookSearch model.Book) (model.Book, error) {
+	for index, book := range model.Books {
+		if book.Id == id {
+			bookPointer := &model.Books[index]
+			bookPointer.Author = bookSearch.Author
+			bookPointer.Title = bookSearch.Title
+			return bookSearch, nil
+		}
+	}
+
+	return model.Book{}, errors.New("cant find book with id " + id)
+}
+
+func DeleteBookById(id string) (model.Book, error) {
+	for index, book := range model.Books {
+		if book.Id == id {
+			model.Books = append(model.Books[:index], model.Books[index+1])
+			return book, nil
+		}
+	}
+
+	return model.Book{}, errors.New("cant find book with id " + id)
+}
