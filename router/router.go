@@ -1,6 +1,7 @@
 package router
 
 import (
+	"Golang-Gin-Gonic/authentication"
 	"Golang-Gin-Gonic/handler"
 
 	"github.com/gin-gonic/gin"
@@ -8,7 +9,8 @@ import (
 
 func NewRouter() *gin.Engine {
 	r := gin.Default()
-	router := r.Group("/gin/api")
+
+	router := r.Group("/gin/api", authentication.BasicAuth)
 
 	bookRouter(router)
 
