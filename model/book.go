@@ -1,19 +1,15 @@
 package model
 
-var Books = []Book{
-	{"1", "What is a Camel", "Robb Banks"},
-	{"2", "Money, Unlimited Pleasure", "Howard Coward"},
-	{"3", "Tell Me Why", "Agus Supriadi"},
-}
+import (
+	"database/sql"
+	"time"
+)
 
 type Book struct {
-	Id     string `json:"id"`
-	Title  string `json:"title"`
-	Author string `json:"author"`
-}
-
-func (book *Book) EmptyingAllField() {
-	book.Id = ""
-	book.Title = ""
-	book.Author = ""
+	Id        uint         `gorm:"primaryKey;autoIncrement;column:id;->;<-:create"`
+	Title     string       `gorm:"column:title;->;<-:create"`
+	Author    string       `gorm:"column:author;->;<-:create"`
+	CreatedAt time.Time    `gorm:"column:created_at;->;<-:create"`
+	UpdatedAt time.Time    `gorm:"column:updated_at;->;<-:create"`
+	DeletedAt sql.NullTime `gorm:"index"`
 }

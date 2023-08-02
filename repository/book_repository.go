@@ -1,66 +1,152 @@
 package repository
 
 import (
+	"Golang-Gin-Gonic/configuration"
 	"Golang-Gin-Gonic/model"
-	"errors"
-	"strconv"
+	"context"
+	"time"
+	"fmt"
+
+	"gorm.io/gorm"
 )
 
-func FindBookById(id string) (model.Book, error) {
-	for _, book := range model.Books {
-		if book.Id == id {
-			return book, nil
-		}
-	}
+var db *gorm.DB
 
-	return model.Book{}, errors.New("book with id" + id + "is not found")
+func init() {
+	db = configuration.DB
 }
 
-func FindBooks() []model.Book {
-	return model.Books
-}
+func FindBookById(ctx context.Context, id uint) (model.Book, error) {
+	book := model.Book{}
+	var err error
 
-func FindBookByDetail(bookSearch model.Book) (model.Book, error) {
-	for _, book := range model.Books {
-		if book.Title == bookSearch.Title && book.Author == bookSearch.Author {
-			return book, nil
-		}
+	tx := db.Begin()
+	err = tx.Where("deleted_at IS null").First(&book, id).Error
+
+	if err != nil {
+		tx.Rollback()
+		return model.Book{}, err
 	}
 
-	return model.Book{}, errors.New("book with Author " + bookSearch.Author + " and title " + bookSearch.Title + " is not found")
-}
+	err = tx.Commit().WithContext(ctx).Error
 
-func AddBook(book model.Book) (model.Book, error) {
-	book.Id = strconv.Itoa(len(model.Books) + 1)
-	model.Books = append(model.Books, book)
-
-	if model.Books[len(model.Books)-1] == book {
-		return book, nil
+	if err != nil {
+		tx.Rollback()
+		return model.Book{}, err
 	}
 
-	return model.Book{}, errors.New("failed to add book to collection")
+	return book, nil
 }
 
-func UpdateBookById(id string, bookSearch model.Book) (model.Book, error) {
-	for index, book := range model.Books {
-		if book.Id == id {
-			bookPointer := &model.Books[index]
-			bookPointer.Author = bookSearch.Author
-			bookPointer.Title = bookSearch.Title
-			return bookSearch, nil
-		}
+func FindBooks(ctx context.Context) ([]model.Book, error) {
+	books := []model.Book{}
+	var err error
+
+	tx := db.Begin()
+	err = tx.Where("deleted_at IS null").Find(&books).Error
+
+	if err != nil {
+		tx.Rollback()
+		return books, err
 	}
 
-	return model.Book{}, errors.New("cant find book with id " + id)
+	err = tx.Commit().WithContext(ctx).Error
+
+	if err != nil {
+		tx.Rollback()
+		return books, err
+	}
+
+	return books, nil
 }
 
-func DeleteBookById(id string) (model.Book, error) {
-	for index, book := range model.Books {
-		if book.Id == id {
-			model.Books = append(model.Books[:index], model.Books[index+1])
-			return book, nil
-		}
+func FindBookByDetail(ctx context.Context, book model.Book) (model.Book, error) {
+	var err error
+	result := model.Book{}
+
+	tx := db.Begin()
+	err = tx.Find(&result).Where("(author = ? AND title = ?) AND deleted_at IS NULL", book.Author, book.Title).Error
+
+	if err != nil {
+		tx.Rollback()
+		return model.Book{}, err
 	}
 
-	return model.Book{}, errors.New("cant find book with id " + id)
+	err = tx.Commit().WithContext(ctx).Error
+
+	if err != nil {
+		tx.Rollback()
+		return model.Book{}, err
+	}
+
+	return result, nil
+}
+
+func AddBook(ctx context.Context, book model.Book) (model.Book, error) {
+	var err error
+
+	tx := db.Begin()
+	err = tx.Create(&book).Error
+
+	if err != nil {
+		tx.Rollback()
+		return model.Book{}, err
+	}
+
+	err = tx.Commit().WithContext(ctx).Error
+
+	if err != nil {
+		tx.Rollback()
+		return model.Book{}, err
+	}
+
+	return book, nil
+}
+
+func UpdateBookById(ctx context.Context, id uint, book model.Book) (model.Book, error) {
+	var err error
+	book.Id = id
+
+	fmt.Println("new book : ", book)
+	tx := db.Begin()
+	err = tx.Model(model.Book{}).Where("id = ? AND deleted_at IS NULL", id).Updates(map[string]any{
+		"author":book.Author,
+		"title":book.Title,
+	}).Error
+
+	if err != nil {
+		tx.Rollback()
+		return model.Book{}, err
+	}
+
+	err = tx.Commit().WithContext(ctx).Error
+
+	if err != nil {
+		tx.Rollback()
+		return model.Book{}, err
+	}
+
+	return book, nil
+}
+
+func DeleteBookById(ctx context.Context, id string) (model.Book, error) {
+	var err error
+	var book model.Book
+
+	tx := db.Begin()
+	err = tx.Model(model.Book{}).Where("id = ? AND deleted_at IS null", id).Update("deleted_at", time.Now()).Error
+
+	if err != nil {
+		tx.Rollback()
+		return model.Book{}, err
+	}
+
+	err = tx.Commit().WithContext(ctx).Error
+
+	if err != nil {
+		tx.Rollback()
+		return model.Book{}, err
+	}
+
+	return book, nil
 }
