@@ -8,6 +8,8 @@ STEP
 7. Logging
 8. Message Broker as microservices
 9. Best Practice
+10. Docker Containerization
+11. Deployment with Docker of course
 
 
 Project

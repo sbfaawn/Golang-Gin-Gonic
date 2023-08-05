@@ -5,8 +5,9 @@ import (
 	"Golang-Gin-Gonic/dto/response"
 	"Golang-Gin-Gonic/model"
 	"Golang-Gin-Gonic/service"
-	"strconv"
+	"Golang-Gin-Gonic/validator"
 	"errors"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,13 +44,18 @@ func GetBooksHandler(ctx *gin.Context) {
 
 func AddBookHandler(ctx *gin.Context) {
 	var request request.BookRequest
-	if err := ctx.BindJSON(&request); err != nil {
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		generateResponse(ctx, 400, "", err)
+		return
+	}
+
+	if err := isRequestValid(&request); err != nil {
 		generateResponse(ctx, 400, "", err)
 		return
 	}
 
 	book := model.Book{
-		Title:  request.Name,
+		Title:  request.Title,
 		Author: request.Author,
 	}
 
@@ -64,26 +70,6 @@ func AddBookHandler(ctx *gin.Context) {
 
 }
 
-func generateResponse(ctx *gin.Context, statusCode int, data any, err error) {
-	var message string
-
-	message = "Success"
-	if statusCode != 200 {
-		message = "Failed"
-	}
-
-	errorMessage := ""
-	if err != nil{
-		errorMessage = err.Error()
-	}
-
-	ctx.JSON(statusCode, response.BaseResponse{
-		Message: message,
-		Data:    data,
-		Error: errorMessage,
-	})
-}
-
 func UpdateBook(ctx *gin.Context) {
 	bookId := ctx.Param("bookId")
 	bookIdNum, _ := strconv.ParseUint(bookId, 10, 32)
@@ -94,8 +80,13 @@ func UpdateBook(ctx *gin.Context) {
 		return
 	}
 
+	if err := isRequestValid(&request); err != nil {
+		generateResponse(ctx, 400, "", err)
+		return
+	}
+
 	book := model.Book{
-		Title:  request.Name,
+		Title:  request.Title,
 		Author: request.Author,
 	}
 
@@ -111,8 +102,9 @@ func UpdateBook(ctx *gin.Context) {
 
 func DeleteBook(ctx *gin.Context) {
 	bookId := ctx.Param("bookId")
+	bookIdNum, _ := strconv.ParseUint(bookId, 10, 32)
 
-	result, err := service.DeleteBook(ctx, bookId)
+	result, err := service.DeleteBook(ctx, uint(bookIdNum))
 
 	if err != nil {
 		generateResponse(ctx, 400, "", err)
@@ -120,4 +112,36 @@ func DeleteBook(ctx *gin.Context) {
 	}
 
 	generateResponse(ctx, 200, result, nil)
+}
+
+func generateResponse(ctx *gin.Context, statusCode int, data any, err error) {
+	var message string
+
+	message = "Success"
+	if statusCode != 200 {
+		message = "Failed"
+	}
+
+	errorMessage := ""
+	if err != nil {
+		errorMessage = err.Error()
+	}
+
+	ctx.JSON(statusCode, response.BaseResponse{
+		Message: message,
+		Data:    data,
+		Error:   errorMessage,
+	})
+}
+
+func isRequestValid(request *request.BookRequest) error {
+	validate := validator.Validate
+
+	err := validate.Struct(request)
+
+	if err != nil {
+		return errors.New("title & author field need to specific on request body")
+	}
+
+	return nil
 }
