@@ -4,8 +4,9 @@ import (
 	"Golang-Gin-Gonic/configuration"
 	"Golang-Gin-Gonic/model"
 	"context"
+	"errors"
+	"strconv"
 	"time"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -105,47 +106,60 @@ func AddBook(ctx context.Context, book model.Book) (model.Book, error) {
 
 func UpdateBookById(ctx context.Context, id uint, book model.Book) (model.Book, error) {
 	var err error
-	book.Id = id
 
-	fmt.Println("new book : ", book)
 	tx := db.Begin()
-	err = tx.Model(model.Book{}).Where("id = ? AND deleted_at IS NULL", id).Updates(map[string]any{
-		"author":book.Author,
-		"title":book.Title,
-	}).Error
+
+	book.Id = id
+	update := tx.Model(&book).Where("deleted_at IS null").Updates(&book)
 
 	if err != nil {
 		tx.Rollback()
 		return model.Book{}, err
 	}
 
-	err = tx.Commit().WithContext(ctx).Error
+	result := update.Commit().WithContext(ctx)
 
-	if err != nil {
+	if result.Error != nil {
 		tx.Rollback()
 		return model.Book{}, err
+	}
+
+	if update.RowsAffected == result.RowsAffected {
+		tx.Rollback()
+		return model.Book{}, errors.New("record with id " + strconv.FormatUint(uint64(id), 10) + " is not found")
 	}
 
 	return book, nil
 }
 
-func DeleteBookById(ctx context.Context, id string) (model.Book, error) {
+func DeleteBookById(ctx context.Context, id uint) (model.Book, error) {
 	var err error
-	var book model.Book
+
+	book := model.Book{
+		Id: id,
+		DeletedAt: gorm.DeletedAt{
+			Time:  time.Now(),
+			Valid: true,
+		},
+	}
 
 	tx := db.Begin()
-	err = tx.Model(model.Book{}).Where("id = ? AND deleted_at IS null", id).Update("deleted_at", time.Now()).Error
+	delete := tx.Model(&book).Where("deleted_at IS null").Delete(&book)
 
-	if err != nil {
+	if delete.Error != nil {
 		tx.Rollback()
 		return model.Book{}, err
 	}
 
-	err = tx.Commit().WithContext(ctx).Error
+	result := delete.Commit().WithContext(ctx)
 
-	if err != nil {
-		tx.Rollback()
+	if result.Error != nil {
 		return model.Book{}, err
+	}
+
+	if delete.RowsAffected == result.RowsAffected {
+		tx.Rollback()
+		return model.Book{}, errors.New("record with id " + strconv.FormatUint(uint64(id), 10) + " is not found")
 	}
 
 	return book, nil

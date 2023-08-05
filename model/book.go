@@ -1,15 +1,16 @@
 package model
 
 import (
-	"database/sql"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Book struct {
-	Id        uint         `gorm:"primaryKey;autoIncrement;column:id;->;<-:create"`
-	Title     string       `gorm:"column:title;->;<-:create"`
-	Author    string       `gorm:"column:author;->;<-:create"`
-	CreatedAt time.Time    `gorm:"column:created_at;->;<-:create"`
-	UpdatedAt time.Time    `gorm:"column:updated_at;->;<-:create"`
-	DeletedAt sql.NullTime `gorm:"index"`
+	Id        uint           `gorm:"primaryKey;autoIncrement;column:id;->;<-:create"`
+	Title     string         `gorm:"column:title;unique;size:256;default:"";<-"`
+	Author    string         `gorm:"column:author;size:256;default:"";<-"`
+	CreatedAt time.Time      `gorm:"column:created_at;->;<-:create"`
+	UpdatedAt time.Time      `gorm:"column:updated_at;<-"`
+	DeletedAt gorm.DeletedAt `gorm:"index;column:deleted_at;<-"`
 }

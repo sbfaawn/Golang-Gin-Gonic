@@ -1,9 +1,10 @@
 package configuration
 
 import (
+	gormLogger "Golang-Gin-Gonic/logger"
 	"Golang-Gin-Gonic/model"
-	"log"
 	"fmt"
+	"log"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -19,7 +20,9 @@ func init() {
 		mysql.Config{
 			DSN: dsn,
 		}),
-		&gorm.Config{},
+		&gorm.Config{
+			Logger: gormLogger.NewGormLogger(),
+		},
 	)
 
 	if err != nil {
@@ -27,9 +30,35 @@ func init() {
 	}
 
 	err = DB.AutoMigrate(&model.Book{})
+	fmt.Println("Error DB Migration : ", err)
 	fmt.Println("Table Migration is done")
 
-	if err != nil{
+	isEmpty := false
+
+	if isEmpty {
+		populateData(DB)
+	}
+
+	if err != nil {
 		fmt.Println(err.Error())
 	}
+}
+
+func populateData(db *gorm.DB) {
+	db.CreateInBatches([]model.Book{
+		{
+			Title:  "How to be Millionaire",
+			Author: "Good Man Stainley",
+		},
+		{
+			Title:  "Big Guy, Big Dong",
+			Author: "Grey Outmilk",
+		},
+		{
+			Title:  "Maddeline, Where are you now?",
+			Author: "Bang John Halal",
+		},
+	}, 3)
+
+	fmt.Println("Data has been Populated!!!!")
 }
