@@ -9,11 +9,11 @@ import (
 
 func NewRouter() *gin.Engine {
 	r := gin.Default()
+	r.Use(gin.Recovery())
 
-	router := r.Group("/gin/api", authentication.BasicAuth)
+	router := r.Group("", authentication.BasicAuth).Group("/gin/api")
 
 	bookRouter(router)
-
 	router.GET("/ping", handler.HealthCheckHandler)
 
 	return r
