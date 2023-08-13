@@ -83,7 +83,7 @@ func FindBookByDetail(ctx context.Context, book model.Book) (model.Book, error) 
 	return result, nil
 }
 
-func AddBook(ctx context.Context, book model.Book) (model.Book, error) {
+func AddBook(ctx context.Context, book model.Book) error {
 	var err error
 
 	tx := db.Begin()
@@ -91,20 +91,20 @@ func AddBook(ctx context.Context, book model.Book) (model.Book, error) {
 
 	if err != nil {
 		tx.Rollback()
-		return model.Book{}, err
+		return err
 	}
 
 	err = tx.Commit().WithContext(ctx).Error
 
 	if err != nil {
 		tx.Rollback()
-		return model.Book{}, err
+		return err
 	}
 
-	return book, nil
+	return nil
 }
 
-func UpdateBookById(ctx context.Context, id uint, book model.Book) (model.Book, error) {
+func UpdateBookById(ctx context.Context, id uint, book model.Book) error {
 	var err error
 
 	tx := db.Begin()
@@ -114,22 +114,22 @@ func UpdateBookById(ctx context.Context, id uint, book model.Book) (model.Book, 
 
 	if err != nil {
 		tx.Rollback()
-		return model.Book{}, err
+		return err
 	}
 
 	result := update.Commit().WithContext(ctx)
 
 	if result.Error != nil {
 		tx.Rollback()
-		return model.Book{}, err
+		return err
 	}
 
 	if update.RowsAffected == result.RowsAffected {
 		tx.Rollback()
-		return model.Book{}, errors.New("record with id " + strconv.FormatUint(uint64(id), 10) + " is not found")
+		return errors.New("record with id " + strconv.FormatUint(uint64(id), 10) + " is not found")
 	}
 
-	return book, nil
+	return nil
 }
 
 func DeleteBookById(ctx context.Context, id uint) (model.Book, error) {

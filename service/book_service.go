@@ -28,23 +28,24 @@ func GetBook(ctx *gin.Context, id uint) (model.Book, error) {
 }
 
 func AddBook(ctx *gin.Context, book model.Book) (model.Book, error) {
-	result, err := repository.AddBook(ctx, book)
+	err := repository.AddBook(ctx, book)
 
 	if err != nil {
 		return model.Book{}, err
 	}
 
-	return result, nil
+	return book, nil
 }
 
 func UpdateBook(ctx *gin.Context, id uint, book model.Book) (model.Book, error) {
-	result, err := repository.UpdateBookById(ctx, id, book)
+	err := repository.UpdateBookById(ctx, id, book)
 
 	if err != nil {
 		return model.Book{}, err
 	}
 
-	return result, nil
+	book.Id = id
+	return book, nil
 }
 
 func DeleteBook(ctx *gin.Context, id uint) (model.Book, error) {
