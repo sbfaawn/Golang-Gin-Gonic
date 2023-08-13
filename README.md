@@ -2,6 +2,7 @@ STEP
 1. Crud API ()
     - validation (request, entity model)
     - get, post, put, delete
+    - add response for not method allowed & no route
 2. Database ORM ()
     - table automigrate & populate data for testing
     - model represent table
@@ -12,14 +13,21 @@ STEP
     - authentication using username & password
     - add response body with 401 status code
 5. Session management
-6. Unit Test
+    - JWT Based Session Management
+    - Login, Register, Refresh Token, Logout
+    - Credential stored in DB
+6. Environtment Variable
+7. Unit Test
     - anytest for test platground
-7. Logging
-8. Message Broker as microservices
-9. Best Practice
+8. Logging
+    - logger for gorm, so far, logger specified for gorm
+9. Message Broker as microservices
+    - Kafka message broker
+    - setup kafka using docker & also zookeeper
+10. Best Practice
     - which one is better, create struct like class with method or struct with all function ???
-10. Docker Containerization
-11. Deployment with Docker of course
+11. Docker Containerization
+12. Deployment with Docker of course
 
 
 Project

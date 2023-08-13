@@ -26,6 +26,7 @@ func JsonWebTokenAuth(ctx *gin.Context) {
 				Data:    "",
 				Error:   err.Error(),
 			})
+			ctx.Abort()
 			return
 		}
 
@@ -34,6 +35,7 @@ func JsonWebTokenAuth(ctx *gin.Context) {
 			Data:    "",
 			Error:   err.Error(),
 		})
+		ctx.Abort()
 		return
 	}
 
@@ -50,6 +52,7 @@ func JsonWebTokenAuth(ctx *gin.Context) {
 				Data:    "",
 				Error:   err.Error(),
 			})
+			ctx.Abort()
 			return
 		}
 
@@ -58,6 +61,7 @@ func JsonWebTokenAuth(ctx *gin.Context) {
 			Data:    "",
 			Error:   err.Error(),
 		})
+		ctx.Abort()
 		return
 	}
 	if !tkn.Valid {
@@ -66,6 +70,7 @@ func JsonWebTokenAuth(ctx *gin.Context) {
 			Data:    "",
 			Error:   err.Error(),
 		})
+		ctx.Abort()
 		return
 	}
 }

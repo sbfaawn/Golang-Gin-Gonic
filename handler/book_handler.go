@@ -49,7 +49,7 @@ func AddBookHandler(ctx *gin.Context) {
 		return
 	}
 
-	if err := isRequestValid(&request); err != nil {
+	if err := isBookRequestValid(&request); err != nil {
 		generateResponse(ctx, 400, "", err)
 		return
 	}
@@ -80,7 +80,7 @@ func UpdateBook(ctx *gin.Context) {
 		return
 	}
 
-	if err := isRequestValid(&request); err != nil {
+	if err := isBookRequestValid(&request); err != nil {
 		generateResponse(ctx, 400, "", err)
 		return
 	}
@@ -134,7 +134,7 @@ func generateResponse(ctx *gin.Context, statusCode int, data any, err error) {
 	})
 }
 
-func isRequestValid(request *request.BookRequest) error {
+func isBookRequestValid(request *request.BookRequest) error {
 	validate := validator.Validate
 
 	err := validate.Struct(request)
