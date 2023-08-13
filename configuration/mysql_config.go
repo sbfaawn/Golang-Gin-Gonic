@@ -29,7 +29,7 @@ func init() {
 		log.Fatalln("? Could not load environment variables", err)
 	}
 
-	err = DB.AutoMigrate(&model.Book{})
+	err = DB.AutoMigrate(&model.Book{}, &model.Credential{})
 	fmt.Println("Error DB Migration : ", err)
 	fmt.Println("Table Migration is done")
 
