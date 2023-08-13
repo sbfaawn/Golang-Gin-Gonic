@@ -11,13 +11,15 @@ func NewRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(gin.Recovery())
 	r.NoRoute(handler.NoRouteHandler)
-	r.NoRoute(handler.NoMethodAllowed)
+	r.NoMethod(handler.NoMethodAllowed)
 
 	router := r.Group("", authentication.BasicAuth).Group("/api")
+	// check jwt token on every route except login, register, ping
 	baseRouter(router)
-	loginRouter(router)
 
-	productRouter := router.Group("/products")
+	authRouter := router.Group("/auth")
+	loginRouter(authRouter)
+	productRouter := router.Group("/products", authentication.JsonWebTokenAuth)
 	bookRouter(productRouter)
 
 	return r
@@ -32,10 +34,10 @@ func bookRouter(r *gin.RouterGroup) {
 }
 
 func loginRouter(r *gin.RouterGroup) {
-	r.POST("/register")
-	r.POST("/login")
-	r.POST("/refresh")
-	r.POST("/logout")
+	r.POST("/register", handler.RegisterHandler)
+	r.POST("/login", handler.LoginHandler)
+	r.GET("/refresh", authentication.JsonWebTokenAuth, handler.RefreshTokenHandler)
+	r.GET("/logout", handler.LogoutHandler)
 }
 
 func baseRouter(r *gin.RouterGroup) {
