@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"Golang-Gin-Gonic/authentication"
+	"Golang-Gin-Gonic/authorization"
 	"Golang-Gin-Gonic/dto/request"
 	"Golang-Gin-Gonic/model"
 	"Golang-Gin-Gonic/service"
@@ -63,7 +63,7 @@ func LoginHandler(ctx *gin.Context) {
 	}
 
 	expirationTime := time.Now().Add(time.Duration(tokenLifetime) * time.Minute)
-	token, err := authentication.GenerateJWTToken(credential.Username, expirationTime)
+	token, err := authorization.GenerateJWTToken(credential.Username, expirationTime)
 
 	if err != nil {
 		generateResponse(ctx, 400, "", err)
@@ -78,7 +78,7 @@ func RefreshTokenHandler(ctx *gin.Context) {
 	token, _ := ctx.Cookie(jwtTokenKey)
 
 	expirationTime := time.Now().Add(time.Duration(tokenLifetime) * time.Minute)
-	newToken, err := authentication.RefreshExpirationToken(token, expirationTime)
+	newToken, err := authorization.RefreshExpirationToken(token, expirationTime)
 
 	if err != nil {
 		generateResponse(ctx, 400, "", err)
