@@ -8,10 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func hello() string {
-	return "Hello"
-}
-
 func AnyTest(t *testing.T) {
 	bookId := "-12"
 
