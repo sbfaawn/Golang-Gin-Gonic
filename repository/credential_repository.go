@@ -28,25 +28,26 @@ func InsertCredential(ctx *gin.Context, credential model.Credential) error {
 	return nil
 }
 
-func FindCredentialByUsernamePassword(ctx *gin.Context, credential model.Credential) error {
+func FindCredentialByUsername(ctx *gin.Context, username string) (model.Credential, error) {
 	var err error
+	var credential model.Credential
 
 	tx := db.Begin()
-	err = tx.Where("deleted_at IS null").First(&credential, "username = ? AND password = ?", credential.Username, credential.Password).Error
+	err = tx.First(&credential, "username = ?", username).Error
 
 	if err != nil {
 		tx.Rollback()
-		return err
+		return credential, err
 	}
 
 	err = tx.Commit().WithContext(ctx).Error
 
 	if err != nil {
 		tx.Rollback()
-		return err
+		return credential, err
 	}
 
-	return nil
+	return credential, nil
 }
 
 func UpdatePasswordByUsername(ctx *gin.Context, username string, newPassword string) error {
