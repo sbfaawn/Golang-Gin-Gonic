@@ -13,6 +13,8 @@ import (
 
 var tokenLifetime int = 5
 
+var jwtTokenKey string = "jwt-token"
+
 func RegisterHandler(ctx *gin.Context) {
 	var request request.CredentialsRequest
 
@@ -68,12 +70,12 @@ func LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("jwt-token", token, tokenLifetime*int(time.Minute), "/", "localhost", false, true)
+	ctx.SetCookie(jwtTokenKey, token, tokenLifetime*int(time.Minute), "/", "localhost", false, true)
 	generateResponse(ctx, 200, "", nil)
 }
 
 func RefreshTokenHandler(ctx *gin.Context) {
-	token, _ := ctx.Cookie("jwt-token")
+	token, _ := ctx.Cookie(jwtTokenKey)
 
 	expirationTime := time.Now().Add(time.Duration(tokenLifetime) * time.Minute)
 	newToken, err := authentication.RefreshExpirationToken(token, expirationTime)
@@ -83,12 +85,12 @@ func RefreshTokenHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("jwt-token", newToken, tokenLifetime*int(time.Minute), "/", "localhost", false, true)
+	ctx.SetCookie(jwtTokenKey, newToken, tokenLifetime*int(time.Minute), "/", "localhost", false, true)
 	generateResponse(ctx, 200, "", nil)
 }
 
 func LogoutHandler(ctx *gin.Context) {
-	ctx.SetCookie("jwt-token", "", -1, "/", "localhost", false, true)
+	ctx.SetCookie(jwtTokenKey, "", -1, "/", "localhost", false, true)
 	generateResponse(ctx, 200, "", nil)
 }
 

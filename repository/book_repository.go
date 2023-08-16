@@ -13,6 +13,8 @@ import (
 
 var db *gorm.DB
 
+var conditionSoftDelete = "deleted_at IS null"
+
 func init() {
 	db = configuration.DB
 }
@@ -22,7 +24,7 @@ func FindBookById(ctx context.Context, id uint) (model.Book, error) {
 	var err error
 
 	tx := db.Begin()
-	err = tx.Where("deleted_at IS null").First(&book, id).Error
+	err = tx.Where(conditionSoftDelete).First(&book, id).Error
 
 	if err != nil {
 		tx.Rollback()
@@ -44,7 +46,7 @@ func FindBooks(ctx context.Context) ([]model.Book, error) {
 	var err error
 
 	tx := db.Begin()
-	err = tx.Where("deleted_at IS null").Find(&books).Error
+	err = tx.Where(conditionSoftDelete).Find(&books).Error
 
 	if err != nil {
 		tx.Rollback()
@@ -110,7 +112,7 @@ func UpdateBookById(ctx context.Context, id uint, book model.Book) error {
 	tx := db.Begin()
 
 	book.Id = id
-	update := tx.Model(&book).Where("deleted_at IS null").Updates(&book)
+	update := tx.Model(&book).Where(conditionSoftDelete).Updates(&book)
 
 	if err != nil {
 		tx.Rollback()

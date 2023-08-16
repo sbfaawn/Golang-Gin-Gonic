@@ -1,7 +1,6 @@
 package validator
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 	"unicode"
@@ -64,8 +63,6 @@ func ValidPassword(fl validator.FieldLevel) bool {
 			return false
 		}
 	}
-
-	fmt.Println(hasNumber, " - ", hasLetter, " - ", suitableLength, " - ", hasUpper, " - ", hasLower, " - ")
 
 	return hasNumber && hasLetter && suitableLength && hasUpper && hasLower
 }
