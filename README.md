@@ -36,6 +36,7 @@ Plan
 2. book db need to be more complicated, add relationship, test gorm, modify model etc (book & author separated)
 3. add concurrentcy using goroutine
 4. Covered with unit test
+5. add http connection to other api
 
 Project
 1. Messaging Backend System

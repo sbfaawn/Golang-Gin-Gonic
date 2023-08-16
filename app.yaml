@@ -1,0 +1,14 @@
+database:
+  mysql:
+    address: localhost
+    username: root
+    password: root
+    port: 3306
+    database: gin-gonic
+    populated: false
+    migrate: true
+
+auth:
+  basic:
+    username: dhika
+    password: password1234
