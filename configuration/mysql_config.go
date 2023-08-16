@@ -3,6 +3,7 @@ package configuration
 import (
 	gormLogger "Golang-Gin-Gonic/logger"
 	"Golang-Gin-Gonic/model"
+	properties_reader "Golang-Gin-Gonic/properties/reader"
 	"fmt"
 	"log"
 
@@ -13,9 +14,11 @@ import (
 var DB *gorm.DB
 
 func init() {
+	conf := properties_reader.Config.Database.ConfigMySql
 	var err error
 
-	dsn := "root:root@tcp(localhost:3306)/gin-gonic?charset=utf8&parseTime=True&loc=Local"
+	dsn := fmt.Sprint(conf.Username, ":", conf.Password, "@tcp(", conf.Address, ":", conf.Port, ")/", conf.Database, "?charset=utf8&parseTime=True&loc=Local")
+	// dsn := "root:root@tcp(localhost:3306)/gin-gonic?charset=utf8&parseTime=True&loc=Local"
 	DB, err = gorm.Open(mysql.New(
 		mysql.Config{
 			DSN: dsn,
@@ -26,21 +29,17 @@ func init() {
 	)
 
 	if err != nil {
-		log.Fatalln("? Could not load environment variables", err)
+		log.Fatalln("? : Could Established Connection to Databases", err)
 	}
 
-	err = DB.AutoMigrate(&model.Book{}, &model.Credential{})
-	fmt.Println("Error DB Migration : ", err)
-	fmt.Println("Table Migration is done")
+	if conf.Migrate {
+		err = DB.AutoMigrate(&model.Book{}, &model.Credential{})
+		fmt.Println("Error DB Migration : ", err)
+		fmt.Println("Table Migration is done")
+	}
 
-	isEmpty := false
-
-	if isEmpty {
+	if conf.Populated {
 		populateData(DB)
-	}
-
-	if err != nil {
-		fmt.Println(err.Error())
 	}
 }
 
@@ -59,6 +58,11 @@ func populateData(db *gorm.DB) {
 			Author: "Bang John Halal",
 		},
 	}, 3)
+
+	db.CreateInBatches([]model.Credential{
+		{Username: "admin", Password: "Admin123"},
+		{Username: "dhika", Password: "Dhika78ty"},
+	}, 2)
 
 	fmt.Println("Data has been Populated!!!!")
 }
