@@ -38,6 +38,9 @@ func loginRouter(r *gin.RouterGroup) {
 	r.POST("/login", handler.LoginHandler)
 	r.GET("/refresh", authorization.JsonWebTokenAuth, handler.RefreshTokenHandler)
 	r.GET("/logout", handler.LogoutHandler)
+	r.POST("/password/change", handler.ChangePasswordHandler)
+	r.POST("/password/reset", handler.ResetPasswordHandler)
+	r.GET("/verification/:email", handler.AccountVerificationHandler)
 }
 
 func baseRouter(r *gin.RouterGroup) {
