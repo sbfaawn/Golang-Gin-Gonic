@@ -1,8 +1,9 @@
 package properties_model
 
 type YamlConfig struct {
-	Database DbProp   `mapstructure:"database"`
-	Auth     AuthProp `mapstructure:"auth"`
+	Database    DbProp   `mapstructure:"database"`
+	Auth        AuthProp `mapstructure:"auth"`
+	AppPassword string   `mapstructure:"emailPass"`
 }
 
 type DbProp struct {

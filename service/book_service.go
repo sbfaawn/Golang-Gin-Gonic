@@ -2,13 +2,13 @@ package service
 
 import (
 	"Golang-Gin-Gonic/model"
-	"Golang-Gin-Gonic/repository"
+	bookRepository "Golang-Gin-Gonic/repository/sql"
 
 	"github.com/gin-gonic/gin"
 )
 
 func GetBooks(ctx *gin.Context) ([]model.Book, error) {
-	books, err := repository.FindBooks(ctx)
+	books, err := bookRepository.FindBooks(ctx)
 
 	if err != nil {
 		return nil, err
@@ -18,7 +18,7 @@ func GetBooks(ctx *gin.Context) ([]model.Book, error) {
 }
 
 func GetBook(ctx *gin.Context, id uint) (model.Book, error) {
-	book, err := repository.FindBookById(ctx, id)
+	book, err := bookRepository.FindBookById(ctx, id)
 
 	if err != nil {
 		return model.Book{}, err
@@ -28,7 +28,7 @@ func GetBook(ctx *gin.Context, id uint) (model.Book, error) {
 }
 
 func AddBook(ctx *gin.Context, book model.Book) (model.Book, error) {
-	err := repository.AddBook(ctx, book)
+	err := bookRepository.AddBook(ctx, book)
 
 	if err != nil {
 		return model.Book{}, err
@@ -38,7 +38,7 @@ func AddBook(ctx *gin.Context, book model.Book) (model.Book, error) {
 }
 
 func UpdateBook(ctx *gin.Context, id uint, book model.Book) (model.Book, error) {
-	err := repository.UpdateBookById(ctx, id, book)
+	err := bookRepository.UpdateBookById(ctx, id, book)
 
 	if err != nil {
 		return model.Book{}, err
@@ -49,7 +49,7 @@ func UpdateBook(ctx *gin.Context, id uint, book model.Book) (model.Book, error) 
 }
 
 func DeleteBook(ctx *gin.Context, id uint) (model.Book, error) {
-	book, err := repository.DeleteBookById(ctx, id)
+	book, err := bookRepository.DeleteBookById(ctx, id)
 
 	if err != nil {
 		return model.Book{}, err

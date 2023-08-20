@@ -3,7 +3,7 @@ package service
 import (
 	authentication "Golang-Gin-Gonic/authentication/hashing"
 	"Golang-Gin-Gonic/model"
-	"Golang-Gin-Gonic/repository"
+	credentialRepository "Golang-Gin-Gonic/repository/sql"
 	"errors"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +18,7 @@ func Register(ctx *gin.Context, credential model.Credential) (model.Credential, 
 
 	credential.Password = hashed
 
-	err = repository.InsertCredential(ctx, credential)
+	err = credentialRepository.InsertCredential(ctx, credential)
 
 	if err != nil {
 		return credential, err
@@ -28,7 +28,11 @@ func Register(ctx *gin.Context, credential model.Credential) (model.Credential, 
 }
 
 func Login(ctx *gin.Context, credential model.Credential) error {
-	result, err := repository.FindCredentialByUsername(ctx, credential.Username)
+	result, err := credentialRepository.FindCredentialByUsername(ctx, credential.Username)
+
+	if !result.IsVerified {
+		return errors.New("account is not verified, please check email and do verification before login")
+	}
 
 	if err != nil {
 		return err

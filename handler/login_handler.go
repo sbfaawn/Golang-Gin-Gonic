@@ -29,8 +29,10 @@ func RegisterHandler(ctx *gin.Context) {
 	}
 
 	credential := model.Credential{
-		Username: request.Username,
-		Password: request.Password,
+		Username:   request.Username,
+		Password:   request.Password,
+		Email:      request.Email,
+		IsVerified: false,
 	}
 
 	result, err := service.Register(ctx, credential)
@@ -104,4 +106,16 @@ func isLoginRequestValid(credential *request.CredentialsRequest) error {
 	}
 
 	return nil
+}
+
+func AccountVerificationHandler(ctx *gin.Context) {
+
+}
+
+func ResetPasswordHandler(ctx *gin.Context) {
+
+}
+
+func ChangePasswordHandler(ctx *gin.Context) {
+
 }
