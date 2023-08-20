@@ -77,3 +77,31 @@ func UpdatePasswordByUsername(ctx *gin.Context, username string, newPassword str
 
 	return nil
 }
+
+func UpdateVerifiedByEmail(ctx *gin.Context, email string) error {
+	var err error
+
+	tx := db.Begin()
+	update := tx.Model(&model.Credential{}).Where("email = ? AND deleted_at IS null", email).Updates(map[string]any{
+		"verified": true,
+	})
+
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	result := update.Commit().WithContext(ctx)
+
+	if result.Error != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if update.RowsAffected == result.RowsAffected {
+		tx.Rollback()
+		return errors.New("record with email " + email + " is not found")
+	}
+
+	return nil
+}

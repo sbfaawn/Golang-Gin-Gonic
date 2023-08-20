@@ -109,13 +109,36 @@ func isLoginRequestValid(credential *request.CredentialsRequest) error {
 }
 
 func AccountVerificationHandler(ctx *gin.Context) {
+	emailParam := ctx.Param("email")
 
+	err := service.AccountVerification(ctx, emailParam)
+
+	if err != nil {
+		generateResponse(ctx, 400, "", err)
+		return
+	}
+
+	generateResponse(ctx, 200, "", nil)
 }
 
 func ResetPasswordHandler(ctx *gin.Context) {
-
+	// send email
 }
 
 func ChangePasswordHandler(ctx *gin.Context) {
+	var resetPass request.ResetPasswordRequest
 
+	if err := ctx.ShouldBindJSON(&resetPass); err != nil {
+		generateResponse(ctx, 400, "", err)
+		return
+	}
+
+	err := service.ChangePassword(ctx, resetPass)
+
+	if err != nil {
+		generateResponse(ctx, 400, "", err)
+		return
+	}
+
+	generateResponse(ctx, 200, "", nil)
 }

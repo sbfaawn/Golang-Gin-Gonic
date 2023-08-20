@@ -60,9 +60,9 @@ func populateData(db *gorm.DB) {
 	}, 3)
 
 	db.CreateInBatches([]model.Credential{
-		{Username: "admin", Password: "Admin123"},
-		{Username: "dhika", Password: "Dhika78ty"},
-	}, 2)
+		{Username: "dhika", Password: "Dhika78ty", Email: "andhikarizki00001@gmail.com", IsVerified: false},
+	},
+		2)
 
 	fmt.Println("Data has been Populated!!!!")
 }
